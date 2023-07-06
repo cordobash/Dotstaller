@@ -8,23 +8,21 @@ yellowColor="\e[1;33m   \b\e   "
 blueColor="\e[1;34m   \b\e   "
 
 # global variables
-dnull= &>/dev/null
+dnull=>/dev/null
 username=$HOME
 
 echo -e "${yellowColor}\The following script are going to uninstall dotfiles and all of his dependencies "
 echo -e "Components to remove : ${resetColor}"
-
-echo -e "${greenColor}
-\- bspwm (Window Manager)
-- sxhkd
-- nitrogen
-- rofi
-- polybar
-- mpd
-- configuration files ${resetColor}"
 sleep 2
-# Global bands to change the status of existing file
-bandExist=false
+echo -e "${redColor}\
+[-] bspwm (Window Manager)
+[-] sxhkd
+[-] nitrogen
+[-] rofi
+[-] polybar
+[-] mpd
+[-] configuration files ${resetColor}"
+sleep 2
 
 # Function to verify if a folder or file exist
 # as first argument is gonna receive the operation to do
@@ -48,19 +46,26 @@ foldersToDelete=("bspwm/" "sxhkd/" "nitrogen/" "mpd/" "ncmpcpp/" "rofi/" "polyba
 function deleteItems {
     for element in "$foldersToDelete[@]"
     do
-    if  existsFile -d "${element} $dnull" 
+    if  existsFile -d "${element} >/dev/null" 
         then
-        # Deleting config files
+        # Deleting config files/folders from .config folder
         rm -r $username/.config/$element
         else
         echo -e "$redColor\The item: ${element} already has been deleted or doesn't exists anymore $resetColor"
     fi
-    # # Also uninstalling dependencie
-    # sudo apt remove $element -y
     done
     echo -e "${greenColor}\The items has been deleted sucessfully ${resetColor}"
     sleep 2
 }
+# An array with the dependencies to remove
+dependencies=("bspwm" "sxhkd" "rofi" "nitrogen" "git" "wget" "polybar" "wmname")
+function removeDepedencies {
+    for deps in "${dependencies[@]}"
+    do
+      sudo apt remove $deps -y >/dev/null
+    done
+}
+
 
 function blankInit {
     if  existsFile -f "$username/.xinitrc"
@@ -72,9 +77,9 @@ function blankInit {
     sleep 1
     fi
 }
-
+# Calling the methods
 deleteItems
-sudo apt remove sxhkd -y
+removeDepedencies
 blankInit
 echo -e "${yellowColor}\Uninstall was sucessfully completed, recommended to reboot your system ${colorReset}"
 sleep 2
