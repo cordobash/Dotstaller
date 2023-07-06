@@ -1,5 +1,0 @@
-bspwm
-rofi
-mpd
-nitrogen
-polybar
