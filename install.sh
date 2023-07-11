@@ -10,18 +10,18 @@ greenColor="\e\b[1;32m   \b\e   "
 yellowColor="\e[1;33m   \b\e   "
 blueColor="\e[1;34m   \b\e   "
 # Variables to make easier to handle paths
-#dnull="&>/dev/null" # sends a null signal to the terminal, will not show any output
 configPath=$HOME/.config/ # Path where configs are gonna put
 fontPath=/usr/share/fonts # Path to install the downloaded fonts
 pathImages=$HOME/.draggedImage # Path to save the initial image on bspwm
+switchHome="cd $HOME" # switch to home user path
 # [**********************************************************************************************]
 # Welcome output
 
 echo  "Dotstall v1.0.0"
 sleep 1
 echo  "Script made by: IGerardoJR"
-echo -e "${yellowColor}\WARNING: This script just works with Arch Linux and Arch based distros ${resetColor}"
-sleep 2
+echo -e "${yellowColor}\WARNING: This script just works with ${blueColor}Arch Linux and based distros  ${resetColor}"
+sleep 3
 # ----------------------------------------------------------------------------------------------------------
 # Stage 1 : Verify dependencies & install missing
 # Declaring two arrays to split the dependencies
@@ -39,7 +39,7 @@ function lookDependencies {
         searchDeps="find /usr/bin/$i" 
         $searchDeps &>/dev/null
        
-    # Comparision if a dependencie was found or not.
+    # Comparing if a dependencie was found or not.
     if [[ $? -eq 0 ]]
     then
         depsFound+=($i)
@@ -49,7 +49,6 @@ function lookDependencies {
     fi
     done
 }
-
 
 # Looking for missing dependencies
 echo -e "$yellowColor\Looking for missing dependencies $resetColor"
@@ -94,20 +93,17 @@ function getDependecies {
 function isMissingSomething {
     if [[ $counterNotFound -gt 0 ]]
     then
-        echo -e "$yellowColor\WARNING: One or more dependencies missing ${resetColor}"
-        sleep 2
+        echo -e "$yellowColor\WARNING: One or more dependencies missing, trying to install them. ${resetColor}"
+        sleep 1
         getDependecies
     fi
 }
-
+# if a missing dependencie, is going to find and install it.
 isMissingSomething
-
-# --------------------------------------------------
+# ----------------------------------------------------------------------------------------------------
 # Stage 2 : Copying and installing configuration files into user system.
 function exiItem {
-    positiveAction=$3
-    negativeAction=$4
-    if test $1 "$2"
+    if test $1 $2
     then
         $3
     else
@@ -115,24 +111,25 @@ function exiItem {
     fi
 }
 
-sleep 2
-current=`pwd`
+# Backup folder is gonna be created just in case we had one or more folders 
+
 
 function backupIfExist {
-    mkdir "${configPath}backup/"
     cd $configPath
+    # mkdir "backup"
+    exiItem "-d" "backup" "" "`mkdir backup`"
     for folder in ${dependencies[@]}
     do
     # If folders in .config path already exists
-    if test -d "${configPath}$folder"
-    then
-        # Moving the items before installation of new items
-        sudo mv $folder "${configPath}backup/$folder.old" &>/dev/null
-        # Else , items DO NOT Exist in .config path and we dont need to do something
-    fi
+    # if test -d "${configPath}$folder"
+    # then
+    #     # Moving the items before installation of new items
+    #     sudo mv $folder "${configPath}backup/$folder.old" &>/dev/null
+    #     # Else , items DO NOT Exist in .config path and we dont need to do something
+    # fi
+    exiItem "-d" "$folder" "`sudo mv $folder ${configPath}backup/$folder.old` &>/dev/null" ""
     done
 }
-
 
 
 
@@ -141,7 +138,7 @@ function getResources {
     backupIfExist 
     # Getting the configuration files
     # Moving onto HOME user
-    cd $HOME
+    $switchHome
     createRes="cd $HOME && mkdir resources && cd resources/"
     exiItem -d "$HOME/resources/" "sudo mv resources/ ${configPath}backup/ && $createRes" "$createRes"
    # mkdir resources && cd resources
@@ -202,9 +199,16 @@ fi
 # }
 
 # creatingInit
-addText=`echo "exec bspwm && sxhkd" >> .xinitrc`
-exiItem -f "$HOME/.xinitrc/" $addText "cd $HOME && touch .xinitrc && chmod +x .xinitrc && $addText"
-# ------------------------------------------------
+# addText="`echo "exec bspwm && sxhkd" >> .xinitrc`"
+# $switchHome
+# exiItem -f ".xinitrc" $addText "cd $HOME && touch .xinitrc && chmod +xwr .xinitrc && $addText"
+
+$switchHome
+addText="`echo "exec bspwm && sxhkd" >> .xinitrc`"
+exiItem "-f" ".xinitrc" "$addText" "`cd $HOME && touch .xinitrc && chmod +xwr .xinitrc && $addText`"
+
+
+# -------------------------------------------------------------------------------------------------
 # Getting the neccesary fonts
 
 # fontsArray=("Iosevka","JetBrainsMono")
