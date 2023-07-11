@@ -1,58 +1,51 @@
 # Dotstall v1.1
-
 # Made by : IGerardoJR
 # https://github.com/IGerardoJR/dotstall
-
-# Script to install my version of dotfiles
-
+# [**********************************************************************************************]
+# Global variables
 # Defining colors to make a colorful output in the terminal
 redColor="\e[1;31m   \b\e   "
 resetColor="\e[1;0m   \b\e   "
 greenColor="\e\b[1;32m   \b\e   "
 yellowColor="\e[1;33m   \b\e   "
 blueColor="\e[1;34m   \b\e   "
+# Variables to make easier to handle paths
+#dnull="&>/dev/null" # sends a null signal to the terminal, will not show any output
+configPath=$HOME/.config/ # Path where configs are gonna put
+fontPath=/usr/share/fonts # Path to install the downloaded fonts
+pathImages=$HOME/.draggedImage # Path to save the initial image on bspwm
+# [**********************************************************************************************]
+# Welcome output
 
-# Global variables
-dnull=`&>/dev/null`
-bandExist=false
-configPath=$HOME/.config/
-fontPath=/usr/share/fonts
-
-
-echo -e "Dotstall v1.0.0"
-echo -e "Script made by: IGerardoJR"
+echo  "Dotstall v1.0.0"
 sleep 1
-#---------------------------------------------------
-# Choosing the distro
-# Options available : Arch Linux and Fedora
-
-# -------------------------------------------------
-# Verifying & Installing Dependencies
-
-# Declaring two arrays to separe the dependencies
+echo  "Script made by: IGerardoJR"
+echo -e "${yellowColor}\WARNING: This script just works with Arch Linux and Arch based distros ${resetColor}"
+sleep 2
+# ----------------------------------------------------------------------------------------------------------
+# Stage 1 : Verify dependencies & install missing
+# Declaring two arrays to split the dependencies
 depsFound=()
 depsNotFound=()
-# Setting up a counter of dependencies found
+# Setting up a counter for missing dependencies to deploy a warning message
 counterNotFound=0
-
 # Setting an array with the necessary dependencies
 dependencies=("bspwm" "sxhkd" "rofi" "nitrogen" "git" "wget" "polybar" "wmname")
 function lookDependencies {
     echo -e "${blueColor}\Verifying current dependencies ${resetColor}"
     for i in "${dependencies[@]}"
     do
-    # Usually execs of dependencies are allocated in the folder /usr/bin/
-    searchDeps="find /usr/bin/$i"
-    $searchDeps &>/dev/null
+        # Usually execs of dependencies are allocated in the folder /usr/bin folder
+        searchDeps="find /usr/bin/$i" 
+        $searchDeps &>/dev/null
+       
     # Comparision if a dependencie was found or not.
     if [[ $? -eq 0 ]]
     then
         depsFound+=($i)
-        sleep 1
     else
         depsNotFound+=($i)
         counterNotFound+=1
-        sleep 1
     fi
     done
 }
@@ -66,14 +59,14 @@ lookDependencies
 # Printing the missing dependencies
     for notFound in "${depsNotFound[@]}"
     do
-        echo -e "$redColor [-] $notFound $resetColor"
+        echo -e "$redColor\[-] $notFound $resetColor"
         sleep 2
     done
 
     # Printing the found dependencies
     for found in "${depsFound[@]}"
     do
-        echo -e "$greenColor [+] $found $resetColor"
+        echo -e "$greenColor\[+] $found $resetColor"
         sleep 2
     done
 
@@ -81,14 +74,17 @@ lookDependencies
 function getDependecies {
     for missing in ${depsNotFound[@]}
     do
-        sudo apt-get install $missing -y $dnull
+        sudo apt-get install $missing -y &>/dev/null
+    # if    success
     if [[ $? == 0 ]]
     then
-    echo -e "$greenColor [+] $missing installed $resetColor"
-    counterNotFound=counterNotFound-1 $dnull
+        # Success Message
+        echo -e "$greenColor\[+] $missing installed $resetColor"
+        counterNotFound=counterNotFound-1 
     sleep 1
     else
-    echo -e "$redColor couldn't find the dependencie $missing $resetColor"
+        # Warning Message
+       echo -e "$redColor \couldn't find $missing $resetColor"
     sleep 1
     fi
     done
@@ -98,7 +94,7 @@ function getDependecies {
 function isMissingSomething {
     if [[ $counterNotFound -gt 0 ]]
     then
-        echo -e "$yellowColor WARNING: One or more dependencies couldn't be satisfied, trying to drag them."
+        echo -e "$yellowColor\WARNING: One or more dependencies missing ${resetColor}"
         sleep 2
         getDependecies
     fi
@@ -107,14 +103,15 @@ function isMissingSomething {
 isMissingSomething
 
 # --------------------------------------------------
-# Stage : Copying configuration files into user system.
-
-function exist {
+# Stage 2 : Copying and installing configuration files into user system.
+function exiItem {
+    positiveAction=$3
+    negativeAction=$4
     if test $1 "$2"
     then
-    return 0
+        $3
     else
-    return 1
+        $4
     fi
 }
 
@@ -122,30 +119,32 @@ sleep 2
 current=`pwd`
 
 function backupIfExist {
-    mkdir $configPath/backup/
+    mkdir "${configPath}backup/"
     cd $configPath
     for folder in ${dependencies[@]}
     do
-    if test -d "$configPath/$folder"
+    # If folders in .config path already exists
+    if test -d "${configPath}$folder"
     then
-    
-    sudo mv $folder "$configPath/backup/$folder.old $dnull"
-    else
-    echo -e "$redColor The folder already exists $resetColor $dnull" 
+        # Moving the items before installation of new items
+        sudo mv $folder "${configPath}backup/$folder.old" &>/dev/null
+        # Else , items DO NOT Exist in .config path and we dont need to do something
     fi
     done
 }
 
 
-# Veryfing if the folders already exits
+
 
 function getResources {
     # Calling the function to verify if the folders already exists
-    backupIfExist
+    backupIfExist 
     # Getting the configuration files
     # Moving onto HOME user
     cd $HOME
-    mkdir resources && cd resources
+    createRes="cd $HOME && mkdir resources && cd resources/"
+    exiItem -d "$HOME/resources/" "sudo mv resources/ ${configPath}backup/ && $createRes" "$createRes"
+   # mkdir resources && cd resources
     pathResources=$HOME/resources
     # Cloning the confis from the following repo
     git clone https://github.com/IGerardoJR/dotfilesV3
@@ -153,7 +152,7 @@ function getResources {
     for element in ${dependencies[@]}
     do
         echo -e "$blueColor\Copying $element configuration files into the system $resetColor"
-        mv $element $configPath/$element $dnull
+        mv $element $configPath/$element &>/dev/null
         sleep 1
     done
 }
@@ -170,7 +169,7 @@ function warningMessage {
         sleep 1
         draggedAll=true
     else
-        echo -e "$redColor\Installation process terminated with errors $resetColor"
+        echo -e "$redColor\Nothing was installed $resetColor"
         sleep 1
         exit 0
     fi
@@ -188,22 +187,23 @@ fi
 
 
 # Function to create .xinitrc
-function creatingInit {
-    exist -f "$HOME/.xinitrc"
-    addText=`echo "exec bspwm && sxhkd" >> .xinitrc`
-    if [[ $? == 0 ]]
-    then
-        $addText     
-    else
-        cd $HOME
-        touch .xinitrc
-        chmod +x .xinitrc
-        $addText
-    fi
-}
+# function creatingInit {
+#     exiItem -f "$HOME/.xinitrc"
+#     addText=`echo "exec bspwm && sxhkd" >> .xinitrc`
+#     if [[ $? == 0 ]]
+#     then
+#         $addText     
+#     else
+#         cd $HOME
+#         touch .xinitrc
+#         chmod +x .xinitrc
+#         $addText
+#     fi
+# }
 
-creatingInit
-
+# creatingInit
+addText=`echo "exec bspwm && sxhkd" >> .xinitrc`
+exiItem -f "$HOME/.xinitrc/" $addText "cd $HOME && touch .xinitrc && chmod +x .xinitrc && $addText"
 # ------------------------------------------------
 # Getting the neccesary fonts
 
@@ -216,7 +216,7 @@ creatingInit
 #     cd $fontPath
 #     for folder in ${fontsArray[@]}
 #     do
-#         exist -d $folder
+#         exiItem -d $folder "pos" "neg"
 #         # Making an smart backup
 #         if [[ $? == 0 ]]
 #         then
@@ -245,25 +245,27 @@ creatingInit
 
 # Creating an default folder to target our downloaded images
 cd $HOME 
-mkdir .draggedImage
+# mkdir .draggedImage
+
+#exiItem -d "$pathImages" ""
 # The function above is gonna set an default image on bspwm to don't see a black screen for the first time.
 function SetDefaultImages {
 
     # Installing Feh package to set an image
-    installFeh=`sudo apt-get install feh -y` $dnull 
+    installFeh="sudo apt-get install feh -y &>/dev/null"
     $installFeh
-    # Getting a default image
-    pathImages=$HOME/.draggedImage/
+
     cd $pathImages
     imageUrl=$1
     fileName=$2
     wget ${imageUrl}
     # Modifying the bspwmrc
-    cd $configPath/bspwm/
+    cd ${configPath}bspwm/
     echo `feh --bg-center $pathImages/$2 & >> bspwmrc $dnull`
 }
 
-SetDefaultImages "https://lardy-aids.000webhostapp.com/198972.png" "198972.png"
+#SetDefaultImages "https://lardy-aids.000webhostapp.com/198972.png" "198972.png"
+SetDefaultImages "https://lardy-aids.000webhostapp.com/1228788.jpg" "1228788.jpg"
 restart=""
 echo -e "${greenColor}\Installation completed, you can restart your system now, do you want to restart?(y/n)${resetColor}"
 sleep 2
