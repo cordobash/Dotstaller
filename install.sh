@@ -75,7 +75,7 @@ lookDependencies
 function getDependecies {
     for missing in ${depsNotFound[@]}
     do
-        sudo apt-get install $missing -y &>/dev/null
+        sudo pacman -S $missing --noconfirm &>/dev/null
     # if    success
     if [[ $? == 0 ]]
     then
@@ -236,7 +236,7 @@ exiItem "-d" ".draggedImages" "`echo &>/dev/null`" "`mkdir .draggedImages`"
 function SetDefaultImages {
     # Installing Feh package to set an image
     cd $binariesPath
-    exiItem "-f" "feh" "" "`sudo apt-get install feh`"
+    exiItem "-f" "feh" "" "`sudo pacman -S feh --noconfirm`"
     cd $pathImages
     imageUrl=$1
     fileName=$2
