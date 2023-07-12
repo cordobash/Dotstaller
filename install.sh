@@ -12,8 +12,11 @@ blueColor="\e[1;34m   \b\e   "
 # Variables to make easier handle paths
 configPath=$HOME/.config/ # Path where configs are gonna put
 fontPath=/usr/share/fonts # Path to install the downloaded fonts
-pathImages=$HOME/.draggedImage # Path to save the initial image on bspwm
+pathImages=$HOME/.draggedImages # Path to save the initial image on bspwm
 switchHome="cd $HOME" # switch to home user path
+bspwmPath="cd $HOME/.config/bspwm/"
+sxhkdPath="cd $HOME/.config/sxhkd/"
+binariesPath="/usr/bin/"
 # [**********************************************************************************************]
 # Welcome output
 
@@ -159,7 +162,7 @@ draggedAll=false
 function warningMessage {
     echo -e "$yellowColor \WARNING: One or more dependencies didn't found, do you wish continue?(y/n) $resetColor"
     answer=""
-    read -p "Write your answer here: " answer
+    read -p "\Write your answer here: " answer
     if [[ $answer == "Y" || $answer == "y" || $answer == "yy" || $answer == "YY" || $answer == "yY" || $answer == "Yy" ]]
     then
         getResources
@@ -233,12 +236,12 @@ cd $HOME
 
 #exiItem -d "$pathImages" ""
 # The function above is gonna set an default image on bspwm to don't see a black screen for the first time.
+$switchHome
+exiItem "-d" ".draggedImages" "`echo &>/dev/null`" "`mkdir .draggedImages`"
 function SetDefaultImages {
-
     # Installing Feh package to set an image
-    installFeh="sudo apt-get install feh -y &>/dev/null"
-    $installFeh
-
+    cd $binariesPath
+    exiItem "-f" "feh" "" "`sudo apt-get install feh`"
     cd $pathImages
     imageUrl=$1
     fileName=$2
@@ -254,15 +257,16 @@ SetDefaultImages "https://lardy-aids.000webhostapp.com/1228788.jpg" "1228788.jpg
 # bspwm & sxhkd has legacy permissions by that we could get errors to start/use the window manager
 # we need to :
 # resets the bspwm & sxhkd legacy permissions to make it work properly
-cd ${configPath}bspwm/
+# cd ${configPath}bspwm/
+$bspwmPath
 exiItem "-f" "bspwmrc" "`chmod +xrw bspwmrc`" "`echo &>/dev/null`"
-cd ${configPath}sxhkd/
-exiItem "-f" "sxhkd" "`chmod +xrw bspwmrc`" "`echo &>/dev/null`"
+$sxhkdPath
+exiItem "-f" "sxhkd" "`chmod +xrw sxhkdrc`" "`echo &>/dev/null`"
 
 restart=""
 echo -e "${greenColor}\Installation completed, you can restart your system now, do you want to restart?(y/n)${resetColor}"
 sleep 2
-read -p "Write your answer here: " restart
+read -p "\Write your answer here: " restart
 if [[ restart == "y" || restart == "Y" ]]
 then
     reboot
