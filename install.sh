@@ -101,6 +101,13 @@ function isMissingSomething {
 isMissingSomething
 # ----------------------------------------------------------------------------------------------------
 # Stage 2 : Copying and installing configuration files into user system.
+# function exiItem receives as parameter
+# $1 receives the kind of the operation :
+#       -f : to find files
+#       -d : to find folders/directories
+# $2 receives the Name of the file or folder
+# $3 if the file or folder is found, what to do.
+# $4 if the file or folder was NOT FOUND , what to do
 function exiItem {
     if test $1 $2
     then
@@ -114,18 +121,12 @@ function exiItem {
 function backupIfExist {
     cd $configPath
     # function  -directory "folderName" "if found" "if not found"
+    # will rename the backup if theres already one and create a new one, if not just the scrip will create one.
     exiItem "-d" "backup" "`mv backup backup.old && mkdir backup &>/dev/null`" "`mkdir backup &>/dev/null`"
     for folder in ${dependencies[@]}
     do
-    # If folders in .config path already exists
-    # if test -d "${configPath}$folder"
-    # then
-    #     # Moving the items before installation of new items
-    #     sudo mv $folder "${configPath}backup/$folder.old" &>/dev/null
-    #     # Else , items DO NOT Exist in .config path and we dont need to do something
-    # fi
     # if a folder of the specified array exists, then it will backup. Else nothing to do
-    exiItem "-d" "$folder" "`sudo mv $folder ${configPath}backup/$folder.old` &>/dev/null" "`echo &>/dev/null`"
+    exiItem "-d" "$folder" "`sudo mv $folder ${configPath}backup/$folder.old &>/dev/null`" "`echo &>/dev/null`"
     done
 }
 
@@ -137,12 +138,13 @@ function getResources {
     # Getting the configuration files
     # Moving onto HOME user
     $switchHome
-    createRes="cd $HOME && mkdir resources && cd resources/"
-    exiItem -d "$HOME/resources/" "sudo mv resources/ ${configPath}backup/ && $createRes" "$createRes"
-   # mkdir resources && cd resources
-    pathResources=$HOME/resources
-    # Cloning the confis from the following repo
-    git clone https://github.com/IGerardoJR/dotfilesV3
+    # createRes="cd $HOME && mkdir resources && cd resources/"
+    # exiItem -d "resources" "`rm -r resources && $createRes`" "$createRes"
+    # pathResources=$HOME/resources
+
+    exiItem "-d" "dotfilesV3" "`rm -r dotfilesV3/`" ""
+    # Cloning the configuration files from the following repo
+    git clone "https://github.com/IGerardoJR/dotfilesV3"
     cd dotfilesV3/
     for element in ${dependencies[@]}
     do
@@ -157,7 +159,7 @@ draggedAll=false
 function warningMessage {
     echo -e "$yellowColor \WARNING: One or more dependencies didn't found, do you wish continue?(y/n) $resetColor"
     answer=""
-    read answer
+    read -p "Write your answer here: " answer
     if [[ $answer == "Y" || $answer == "y" || $answer == "yy" || $answer == "YY" || $answer == "yY" || $answer == "Yy" ]]
     then
         getResources
@@ -180,29 +182,9 @@ then
     sleep 1
 fi
 
-
-# Function to create .xinitrc
-# function creatingInit {
-#     exiItem -f "$HOME/.xinitrc"
-#     addText=`echo "exec bspwm && sxhkd" >> .xinitrc`
-#     if [[ $? == 0 ]]
-#     then
-#         $addText     
-#     else
-#         cd $HOME
-#         touch .xinitrc
-#         chmod +x .xinitrc
-#         $addText
-#     fi
-# }
-
-# creatingInit
-# addText="`echo "exec bspwm && sxhkd" >> .xinitrc`"
-# $switchHome
-# exiItem -f ".xinitrc" $addText "cd $HOME && touch .xinitrc && chmod +xwr .xinitrc && $addText"
-
+# Creating .xinitrc file
 $switchHome
-addText="`echo "exec bspwm && sxhkd" >> .xinitrc`"
+addText="`echo "exec bspwm && sxhkd &&" >> .xinitrc`"
 exiItem "-f" ".xinitrc" "$addText" "`cd $HOME && touch .xinitrc && chmod +xwr .xinitrc && $addText`"
 
 
@@ -263,15 +245,24 @@ function SetDefaultImages {
     wget ${imageUrl}
     # Modifying the bspwmrc
     cd ${configPath}bspwm/
-    echo `feh --bg-center $pathImages/$2 & >> bspwmrc $dnull`
+    echo "`feh --bg-center $pathImages/$2  >> bspwmrc`"
 }
 
 #SetDefaultImages "https://lardy-aids.000webhostapp.com/198972.png" "198972.png"
 SetDefaultImages "https://lardy-aids.000webhostapp.com/1228788.jpg" "1228788.jpg"
+
+# bspwm & sxhkd has legacy permissions by that we could get errors to start/use the window manager
+# we need to :
+# resets the bspwm & sxhkd legacy permissions to make it work properly
+cd ${configPath}bspwm/
+exiItem "-f" "bspwmrc" "`chmod +xrw bspwmrc`" "`echo &>/dev/null`"
+cd ${configPath}sxhkd/
+exiItem "-f" "sxhkd" "`chmod +xrw bspwmrc`" "`echo &>/dev/null`"
+
 restart=""
 echo -e "${greenColor}\Installation completed, you can restart your system now, do you want to restart?(y/n)${resetColor}"
 sleep 2
-read restart
+read -p "Write your answer here: " restart
 if [[ restart == "y" || restart == "Y" ]]
 then
     reboot

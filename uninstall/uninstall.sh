@@ -8,19 +8,18 @@ yellowColor="\e[1;33m   \b\e   "
 blueColor="\e[1;34m   \b\e   "
 
 # global variables
-dnull=>/dev/null
+dnull=&>/dev/null
 username=$HOME
 
 echo -e "${yellowColor}\The following script are going to uninstall dotfiles and all of his dependencies "
 echo -e "Components to remove : ${resetColor}"
 sleep 2
-echo -e "${redColor}\
-[-] bspwm (Window Manager)
+echo -e "${yellowColor}\
+[-] bspwm
 [-] sxhkd
 [-] nitrogen
 [-] rofi
 [-] polybar
-[-] mpd
 [-] configuration files ${resetColor}"
 sleep 2
 
@@ -34,14 +33,14 @@ sleep 2
 function existsFile {
     if test $1 "$2"
     then
-    return 0
+        $3
     else
-    return 1
+        $4
     fi
 }
 
 
-foldersToDelete=("bspwm/" "sxhkd/" "nitrogen/" "mpd/" "ncmpcpp/" "rofi/" "polybar/" "cava/")
+foldersToDelete=("bspwm" "sxhkd" "nitrogen" "rofi" "polybar")
 
 function deleteItems {
     for element in "$foldersToDelete[@]"
