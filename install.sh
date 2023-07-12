@@ -104,7 +104,7 @@ function isMissingSomething {
 isMissingSomething
 # ----------------------------------------------------------------------------------------------------
 # Stage 2 : Copying and installing configuration files into user system.
-# function exiItem receives as parameter
+# exiItem checks if a file or folder already exists
 # $1 receives the kind of the operation :
 #       -f : to find files
 #       -d : to find folders/directories
@@ -129,7 +129,7 @@ function backupIfExist {
     for folder in ${dependencies[@]}
     do
     # if a folder of the specified array exists, then it will backup. Else nothing to do
-    exiItem "-d" "$folder" "`sudo mv $folder ${configPath}backup/$folder.old &>/dev/null`" "`echo &>/dev/null`"
+    exiItem "-d" "$folder" "`sudo mv $folder ${configPath}backup/$folder.old &>/dev/null` " "`echo &>/dev/null`"
     done
 }
 
@@ -145,7 +145,7 @@ function getResources {
     # exiItem -d "resources" "`rm -r resources && $createRes`" "$createRes"
     # pathResources=$HOME/resources
 
-    exiItem "-d" "dotfilesV3" "`rm -r dotfilesV3/`" ""
+    exiItem "-d" "dotfilesV3" "`sudo rm -r dotfilesV3/`" ""
     # Cloning the configuration files from the following repo
     git clone "https://github.com/IGerardoJR/dotfilesV3"
     cd dotfilesV3/
@@ -194,49 +194,44 @@ exiItem "-f" ".xinitrc" "$addText" "`cd $HOME && touch .xinitrc && chmod +xwr .x
 # -------------------------------------------------------------------------------------------------
 # Getting the neccesary fonts
 
-# fontsArray=("Iosevka","JetBrainsMono")
+fontsArray=("Iosevka" "JetBrainsMono" "material-icons-font")
+ cd $fontPath
+    for folder in ${fontsArray[@]}
+    do
+        exiItem -d $folder "`sudo rm -r $folder`" ""
+    done
 
-# function getFonts {
-#     url=$1
-#     nameFolder=$2
-#     via=$3
-#     cd $fontPath
-#     for folder in ${fontsArray[@]}
-#     do
-#         exiItem -d $folder "pos" "neg"
-#         # Making an smart backup
-#         if [[ $? == 0 ]]
-#         then
-#         mv $folder $folder.old $dnull
-#         fi
-#     # Starting the download proccess
-#     cd $fontPath
-#     mkdir $2
-#     cd $2
-#     # Getting the fonts.zip via wget
-#     if [[ $via == "wget" ]]
-#     then
-#     wget $url
-#     else
-#     git clone $3
-#     fi
-#     sleep 1
-#     done
-# }
+# will get fonts & install necessary nerd fonts    
+function getFonts {
+    url=$1
+    nameFolder=$2
+    via=$3
+    cd $fontPath
+    sudo mkdir $2
+    cd $2
+    # Starting the download proccess
+    # Getting the fonts.zip via wget
+    if [[ $via == "wget" ]]
+    then
+        sudo wget $url
+    else
+        # or cloning a repo with git clone
+        sudo git clone $url
+    fi
+    echo -e "$greenColor\Unpackaing and installing font $2 $resetColor"
+    sudo unzip $2.zip &>/dev/null
+    sleep 1
+}
 
-# getFonts "https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Iosevka.zip" "Iosevka" "wget"
-# getFonts "https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/JetBrainsMono.zip" "JetBrainsMono" "wget"
-# getFonts " https://github.com/daimoonis/material-icons-font" "material-icons-font" "github"
-
+getFonts "https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Iosevka.zip" "Iosevka" "wget"
+getFonts "https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/JetBrainsMono.zip" "JetBrainsMono" "wget"
+getFonts " https://github.com/daimoonis/material-icons-font" "material-icons-font" "github"
 
 
-# Creating an default folder to target our downloaded images
-cd $HOME 
-# mkdir .draggedImage
 
-#exiItem -d "$pathImages" ""
 # The function above is gonna set an default image on bspwm to don't see a black screen for the first time.
 $switchHome
+# validating if .draggedImages folder already exists
 exiItem "-d" ".draggedImages" "`echo &>/dev/null`" "`mkdir .draggedImages`"
 function SetDefaultImages {
     # Installing Feh package to set an image
@@ -251,7 +246,7 @@ function SetDefaultImages {
     echo "`feh --bg-center $pathImages/$2  >> bspwmrc`"
 }
 
-#SetDefaultImages "https://lardy-aids.000webhostapp.com/198972.png" "198972.png"
+
 SetDefaultImages "https://lardy-aids.000webhostapp.com/1228788.jpg" "1228788.jpg"
 
 # bspwm & sxhkd has legacy permissions by that we could get errors to start/use the window manager
