@@ -9,7 +9,7 @@ resetColor="\e[1;0m   \b\e   "
 greenColor="\e\b[1;32m   \b\e   "
 yellowColor="\e[1;33m   \b\e   "
 blueColor="\e[1;34m   \b\e   "
-# Variables to make easier to handle paths
+# Variables to make easier handle paths
 configPath=$HOME/.config/ # Path where configs are gonna put
 fontPath=/usr/share/fonts # Path to install the downloaded fonts
 pathImages=$HOME/.draggedImage # Path to save the initial image on bspwm
@@ -17,13 +17,13 @@ switchHome="cd $HOME" # switch to home user path
 # [**********************************************************************************************]
 # Welcome output
 
-echo  "Dotstall v1.0.0"
+echo  "Dotstall v1.1.0"
 sleep 1
 echo  "Script made by: IGerardoJR"
-echo -e "${yellowColor}\WARNING: This script just works with ${blueColor}Arch Linux and based distros  ${resetColor}"
+echo -e "${yellowColor}\WARNING: This script just works with: ${blueColor}\Arch Linux and based distros  ${resetColor}"
 sleep 3
-# ----------------------------------------------------------------------------------------------------------
-# Stage 1 : Verify dependencies & install missing
+# --------------------------------------------------------------------------------------------------------------------------------
+# Stage 1 : Veryfing dependencies & install missing(if there's)
 # Declaring two arrays to split the dependencies
 depsFound=()
 depsNotFound=()
@@ -38,7 +38,6 @@ function lookDependencies {
         # Usually execs of dependencies are allocated in the folder /usr/bin folder
         searchDeps="find /usr/bin/$i" 
         $searchDeps &>/dev/null
-       
     # Comparing if a dependencie was found or not.
     if [[ $? -eq 0 ]]
     then
@@ -69,7 +68,7 @@ lookDependencies
         sleep 2
     done
 
-# Based on the arrays, we're gonna drag the missing dependencies from dnf repos
+# Based on the arrays, we're gonna drag the missing dependencies from pacman repos
 function getDependecies {
     for missing in ${depsNotFound[@]}
     do
@@ -98,7 +97,7 @@ function isMissingSomething {
         getDependecies
     fi
 }
-# if a missing dependencie, is going to find and install it.
+# if a missing dependencie, is going to find and install it with the default package manager of the distro.
 isMissingSomething
 # ----------------------------------------------------------------------------------------------------
 # Stage 2 : Copying and installing configuration files into user system.
@@ -111,13 +110,11 @@ function exiItem {
     fi
 }
 
-# Backup folder is gonna be created just in case we had one or more folders 
-
-
+# Backup folder is gonna be created just in case we had one or more folders in the configPath
 function backupIfExist {
     cd $configPath
-    # mkdir "backup"
-    exiItem "-d" "backup" "" "`mkdir backup`"
+    # function  -directory "folderName" "if found" "if not found"
+    exiItem "-d" "backup" "`mv backup backup.old && mkdir backup &>/dev/null`" "`mkdir backup &>/dev/null`"
     for folder in ${dependencies[@]}
     do
     # If folders in .config path already exists
@@ -127,7 +124,8 @@ function backupIfExist {
     #     sudo mv $folder "${configPath}backup/$folder.old" &>/dev/null
     #     # Else , items DO NOT Exist in .config path and we dont need to do something
     # fi
-    exiItem "-d" "$folder" "`sudo mv $folder ${configPath}backup/$folder.old` &>/dev/null" ""
+    # if a folder of the specified array exists, then it will backup. Else nothing to do
+    exiItem "-d" "$folder" "`sudo mv $folder ${configPath}backup/$folder.old` &>/dev/null" "`echo &>/dev/null`"
     done
 }
 
