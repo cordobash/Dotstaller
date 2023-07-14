@@ -7,9 +7,14 @@ greenColor="\e\b[1;32m   \b\e   "
 yellowColor="\e[1;33m   \b\e   "
 blueColor="\e[1;34m   \b\e   "
 
-# global variables
-dnull=&>/dev/null
-username=$HOME
+# Variables to make easier handle paths
+configPath=$HOME/.config/ # Path where configs are gonna put
+fontPath=/usr/share/fonts # Path to install the downloaded fonts
+pathImages=$HOME/.draggedImages # Path to save the initial image on bspwm
+switchHome="cd $HOME" # switch to home user path
+bspwmPath="cd $HOME/.config/bspwm/" # goes into bspwm path folder
+sxhkdPath="cd $HOME/.config/sxhkd/" # goes into sxhkd path folder
+binariesPath="/usr/bin/" # goes to binaries folder, where usually packages are allotated
 
 echo -e "${yellowColor}\The following script are going to uninstall dotfiles and all of his dependencies "
 echo -e "Components to remove : ${resetColor}"
@@ -23,15 +28,9 @@ echo -e "${yellowColor}\
 [-] configuration files ${resetColor}"
 sleep 2
 
-# Function to verify if a folder or file exist
-# as first argument is gonna receive the operation to do
-# -f  => Will check just files
-# -d  => Is gonna look for directories/folders
-# as second parameter is going to receive the file/folder to search
-# usage example : -f "uninstall.sh"
-# or : -d "myFolder"
-function existsFile {
-    if test $1 "$2"
+# find a file or folder and do something pending the result.
+function existsItem {
+    if test $1 $2
     then
         $3
     else
@@ -39,48 +38,36 @@ function existsFile {
     fi
 }
 
-
-foldersToDelete=("bspwm" "sxhkd" "nitrogen" "rofi" "polybar")
-
-function deleteItems {
-    for element in "$foldersToDelete[@]"
+deps=("bspwm" "sxhkd" "rofi" "polybar")
+function deleteBinaries {
+    echo "$yellowColor\Deleting dependencies. This may take time $resetColor"
+    cd $binariesPath
+    for dl in ${deps[@]}
     do
-    if  existsFile -d "${element} >/dev/null" 
-        then
-        # Deleting config files/folders from .config folder
-        rm -r $username/.config/$element
-        else
-        echo -e "$redColor\The item: ${element} already has been deleted or doesn't exists anymore $resetColor"
-    fi
+         existsItem "-f" "$dl" "`sudo pacman -r $dl --noconfirm`" "`echo "$redColor\ $dl not found $resetColor"`"
+         sleep 1
     done
-    echo -e "${greenColor}\The items has been deleted sucessfully ${resetColor}"
-    sleep 2
-}
-# An array with the dependencies to remove
-dependencies=("bspwm" "sxhkd" "rofi" "nitrogen" "git" "wget" "polybar" "wmname")
-function removeDepedencies {
-    for deps in "${dependencies[@]}"
+} 
+
+function deleteConfigurations {
+    cd $configPath
+    for config in "$deps[@]"
     do
-      sudo apt remove $deps -y >/dev/null
+        existsItem "-d" $config "`rm -r $config && echo "Deleting $config configurations"`" "`echo "$config configurations was not found"`"
+        sleep 1
     done
+    echo -e "$greenColor\Items deleted$resetColor"
 }
 
 
-function blankInit {
-    if  existsFile -f "$username/.xinitrc"
-    then
-    echo "" >> .xinitrc
-    sleep 1
-    else
-    echo -e "$yellowColor\The file was already removed or doesn't exist anymore$resetColor"
-    sleep 1
-    fi
-}
 # Calling the methods
-deleteItems
-removeDepedencies
-blankInit
-echo -e "${yellowColor}\Uninstall was sucessfully completed, recommended to reboot your system ${colorReset}"
+deleteBinaries
+deleteConfigurations
+# deleting the .xinitrc file
+$switchHome
+existsItem "-f" ".xinitrc" "`rm .xinitrc`" "`echo &>/dev/null`"
+echo -e "${yellowColor}\Uninstall completed, you might reboot the system ${colorReset}"
+echo "Good bye!"
 sleep 2
 
 

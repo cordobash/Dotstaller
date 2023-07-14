@@ -14,9 +14,9 @@ configPath=$HOME/.config/ # Path where configs are gonna put
 fontPath=/usr/share/fonts # Path to install the downloaded fonts
 pathImages=$HOME/.draggedImages # Path to save the initial image on bspwm
 switchHome="cd $HOME" # switch to home user path
-bspwmPath="cd $HOME/.config/bspwm/"
-sxhkdPath="cd $HOME/.config/sxhkd/"
-binariesPath="/usr/bin/"
+bspwmPath="cd $HOME/.config/bspwm/" # goes into bspwm path folder
+sxhkdPath="cd $HOME/.config/sxhkd/" # goes into sxhkd path folder
+binariesPath="/usr/bin/" # goes to binaries folder, where usually packages are allotated
 # [**********************************************************************************************]
 # Welcome output
 
