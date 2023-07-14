@@ -15,13 +15,13 @@ echo -e "${yellowColor}\The following script are going to uninstall dotfiles and
 echo -e "Components to remove : ${resetColor}"
 sleep 2
 echo -e "${yellowColor}\
-[-] bspwm
-[-] sxhkd
-[-] nitrogen
-[-] rofi
-[-] polybar
-[-] configuration files ${resetColor}"
-sleep 2
+        \- bspwm
+        - sxhkd
+        - nitrogen
+        - rofi
+        - polybar
+        - configuration files ${resetColor}"
+sleep 4
 
 # find a file or folder and do something pending the result.
 function existsItem {
@@ -36,21 +36,24 @@ function existsItem {
 deps=("bspwm" "sxhkd" "rofi" "polybar")
 function deleteBinaries {
     echo -e "$yellowColor\Deleting dependencies. This may take time $resetColor"
+    sleep 2
     for dl in "${deps[@]}"
     do
          existsItem "-f" "$dl" "`sudo pacman -R $dl --noconfirm`" "`echo "$redColor\${dl}not found $resetColor"`"
-         sleep 1
+         sleep 2
     done
 } 
 
 function deleteConfigurations {
     cd $configPath
+    echo -e "$blueColor\Deleting configurations files...$resetColor"
     for folders in "${deps[@]}"
     do
-        existsItem "-d" "$folders" "`rm -r $folders && echo "Deleting $folders configurations"`" "`echo "$folders configurations was not found"`"
-        sleep 1
+        existsItem "-d" "$folders" "`rm -r $folders && echo "Deleting $folders configurations"`" "`echo -e "$redColor\ $folders configurations was not found $resetColor"`"
+        sleep 2
     done
     echo -e "$greenColor\Items deleted$resetColor"
+    sleep 1s
 }
 
 
@@ -59,7 +62,7 @@ deleteBinaries
 deleteConfigurations
 # deleting the .xinitrc file
 $switchHome
-existsItem "-f" ".xinitrc" "`rm .xinitrc`" "`echo &>/dev/null`"
+existsItem "-f" ".xinitrc" "`rm .xinitrc && echo &>/dev/null`" "`echo &>/dev/null`"
 echo -e "${yellowColor}\Uninstall completed, you might reboot the system ${colorReset}"
 echo "Good bye!"
 sleep 2
