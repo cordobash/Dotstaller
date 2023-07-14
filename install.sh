@@ -165,8 +165,9 @@ function warningMessage {
     read -p "\Write your answer here: " answer
     if [[ $answer == "Y" || $answer == "y" || $answer == "yy" || $answer == "YY" || $answer == "yY" || $answer == "Yy" ]]
     then
+        sleep 2
         getResources
-        sleep 1
+        sleep 2
         draggedAll=true
     else
         echo -e "$redColor\Nothing was installed $resetColor"
@@ -181,6 +182,7 @@ then
 elif [[ $draggedAll == false ]]
 then
     echo -e "$greenColor\All dependencies was satisfied, getting the resources $resetColor"
+    sleep 2
     getResources
     sleep 1
 fi
@@ -222,12 +224,10 @@ function getFonts {
     sudo unzip $2.zip &>/dev/null
     sleep 1
 }
-
+# Getting the fonts
 getFonts "https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Iosevka.zip" "Iosevka" "wget"
 getFonts "https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/JetBrainsMono.zip" "JetBrainsMono" "wget"
 getFonts " https://github.com/daimoonis/material-icons-font" "material-icons-font" "github"
-
-
 
 # The function above is gonna set an default image on bspwm to don't see a black screen for the first time.
 $switchHome
@@ -243,7 +243,8 @@ function SetDefaultImages {
     wget ${imageUrl}
     # Modifying the bspwmrc
     cd ${configPath}bspwm/
-    echo "`feh --bg-center $pathImages/$2  >> bspwmrc`"
+    modifyBspwm="`echo "feh --bg-center $pathImages/$2" >> bspwmrc`"
+    $modifyBspwm
 }
 
 
@@ -256,14 +257,20 @@ SetDefaultImages "https://lardy-aids.000webhostapp.com/1228788.jpg" "1228788.jpg
 $bspwmPath
 exiItem "-f" "bspwmrc" "`chmod +xrw bspwmrc`" "`echo &>/dev/null`"
 $sxhkdPath
-exiItem "-f" "sxhkd" "`chmod +xrw sxhkdrc`" "`echo &>/dev/null`"
+exiItem "-f" "sxhkdrc" "`chmod +xrw sxhkdrc`" "`echo &>/dev/null`"
 
 restart=""
-echo -e "${greenColor}\Installation completed, you can restart your system now, do you want to restart?(y/n)${resetColor}"
+echo -e "${greenColor}\Installation completed${resetColor}"
 sleep 2
-read -p "\Write your answer here: " restart
-if [[ restart == "y" || restart == "Y" ]]
+echo -e "$yellowColor \!TIP: When you logon for first time to bspwm, you can use the shortcut ALT+D to open Rofi menu $resetColor"
+sleep 2
+echo -e "$yellowColor\TIP: To see all the shortcuts open the file sxhkdrc, who is at the next path ~/.config/sxhkd/sxhkdrc"
+sleep 2
+read -p "\Do you want to reboot the system to apply the changes? (y/n): " restart
+if [[ $restart == "y" || $restart == "Y" ]]
 then
+    echo -e "$yellowColor\The system is going to shutdown in 3 seconds...$resetColor"
+    sleep 3
     reboot
 else
     exit 0
