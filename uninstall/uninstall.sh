@@ -38,16 +38,16 @@ function deleteBinaries {
     echo -e "$yellowColor\Deleting dependencies. This may take time $resetColor"
     for dl in "${deps[@]}"
     do
-         existsItem "-f" "$dl" "`sudo pacman -r $dl --noconfirm`" "`echo "$redColor\ $dl not found $resetColor"`"
+         existsItem "-f" "$dl" "`sudo pacman -R $dl --noconfirm`" "`echo "$redColor\${dl}not found $resetColor"`"
          sleep 1
     done
 } 
 
 function deleteConfigurations {
     cd $configPath
-    for config in "${deps[@]}"
+    for folders in "${deps[@]}"
     do
-        existsItem "-d" $config "`rm -r $config && echo "Deleting $config configurations"`" "`echo "$config configurations was not found"`"
+        existsItem "-d" "$folders" "`rm -r $folders && echo "Deleting $folders configurations"`" "`echo "$folders configurations was not found"`"
         sleep 1
     done
     echo -e "$greenColor\Items deleted$resetColor"

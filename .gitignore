@@ -2,3 +2,4 @@ scriptInstalacionDotfiles/
 testScript.sh
 bspwmrc
 .xinitrc
+install.sh
