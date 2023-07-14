@@ -125,11 +125,11 @@ function backupIfExist {
     cd $configPath
     # function  -directory "folderName" "if found" "if not found"
     # will rename the backup if theres already one and create a new one, if not just the scrip will create one.
-    exiItem "-d" "backup" "`mv backup backup.old && mkdir backup &>/dev/null`" "`mkdir backup &>/dev/null`"
+    exiItem "-d" "backup" "`mv backup backup.old && mkdir backup && echo &>/dev/null`" "`mkdir backup && echo &>/dev/null`"
     for folder in ${dependencies[@]}
     do
     # if a folder of the specified array exists, then it will backup. Else nothing to do
-    exiItem "-d" "$folder" "`sudo mv $folder ${configPath}backup/$folder.old &>/dev/null` " "`echo &>/dev/null`"
+    exiItem "-d" "$folder" "`sudo mv $folder ${configPath}backup/$folder.old && echo &>/dev/null` " "`echo &>/dev/null`"
     done
 }
 
@@ -145,7 +145,7 @@ function getResources {
     # exiItem -d "resources" "`rm -r resources && $createRes`" "$createRes"
     # pathResources=$HOME/resources
 
-    exiItem "-d" "dotfilesV3" "`sudo rm -r dotfilesV3/`" ""
+    exiItem "-d" "dotfilesV3" "`sudo rm -r dotfilesV3/`" "`echo &>/dev/null`"
     # Cloning the configuration files from the following repo
     git clone "https://github.com/IGerardoJR/dotfilesV3"
     cd dotfilesV3/
