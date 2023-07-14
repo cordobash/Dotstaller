@@ -111,6 +111,8 @@ isMissingSomething
 # $2 receives the Name of the file or folder
 # $3 if the file or folder is found, what to do.
 # $4 if the file or folder was NOT FOUND , what to do
+
+folders=("bspwm" "sxhkd" "polybar" "rofi")
 function exiItem {
     if test $1 $2
     then
@@ -126,7 +128,7 @@ function backupIfExist {
     # function  -directory "folderName" "if found" "if not found"
     # will rename the backup if theres already one and create a new one, if not just the scrip will create one.
     exiItem "-d" "backup" "`mv backup backup.old && mkdir backup && echo &>/dev/null`" "`mkdir backup && echo &>/dev/null`"
-    for folder in ${dependencies[@]}
+    for folder in ${folders[@]}
     do
     # if a folder of the specified array exists, then it will backup. Else nothing to do
     exiItem "-d" "$folder" "`sudo mv $folder ${configPath}backup/$folder.old && echo &>/dev/null` " "`echo &>/dev/null`"
@@ -225,6 +227,7 @@ function getFonts {
     sleep 1
 }
 # Getting the fonts
+echo -e "$yellowColor\Downloading and installing the neccesary fonts, THIS MAY TAKE TIME. $resetColor"
 getFonts "https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/Iosevka.zip" "Iosevka" "wget"
 getFonts "https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/JetBrainsMono.zip" "JetBrainsMono" "wget"
 getFonts " https://github.com/daimoonis/material-icons-font" "material-icons-font" "github"

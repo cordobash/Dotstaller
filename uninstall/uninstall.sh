@@ -9,12 +9,7 @@ blueColor="\e[1;34m   \b\e   "
 
 # Variables to make easier handle paths
 configPath=$HOME/.config/ # Path where configs are gonna put
-fontPath=/usr/share/fonts # Path to install the downloaded fonts
-pathImages=$HOME/.draggedImages # Path to save the initial image on bspwm
 switchHome="cd $HOME" # switch to home user path
-bspwmPath="cd $HOME/.config/bspwm/" # goes into bspwm path folder
-sxhkdPath="cd $HOME/.config/sxhkd/" # goes into sxhkd path folder
-binariesPath="/usr/bin/" # goes to binaries folder, where usually packages are allotated
 
 echo -e "${yellowColor}\The following script are going to uninstall dotfiles and all of his dependencies "
 echo -e "Components to remove : ${resetColor}"
@@ -40,9 +35,8 @@ function existsItem {
 
 deps=("bspwm" "sxhkd" "rofi" "polybar")
 function deleteBinaries {
-    echo "$yellowColor\Deleting dependencies. This may take time $resetColor"
-    cd $binariesPath
-    for dl in ${deps[@]}
+    echo -e "$yellowColor\Deleting dependencies. This may take time $resetColor"
+    for dl in "${deps[@]}"
     do
          existsItem "-f" "$dl" "`sudo pacman -r $dl --noconfirm`" "`echo "$redColor\ $dl not found $resetColor"`"
          sleep 1
@@ -51,7 +45,7 @@ function deleteBinaries {
 
 function deleteConfigurations {
     cd $configPath
-    for config in "$deps[@]"
+    for config in "${deps[@]}"
     do
         existsItem "-d" $config "`rm -r $config && echo "Deleting $config configurations"`" "`echo "$config configurations was not found"`"
         sleep 1
