@@ -200,7 +200,7 @@ fontsArray=("Iosevka" "JetBrainsMono" "material-icons-font")
  cd $fontPath
     for folder in ${fontsArray[@]}
     do
-        exiItem -d $folder "`sudo rm -r $folder`" ""
+        exiItem -d $folder "`sudo rm -r $folder && echo &>/dev/null`" "`echo &>/dev/null`"
     done
 
 # will get fonts & install necessary nerd fonts    
