@@ -14,13 +14,12 @@ switchHome="cd $HOME" # switch to home user path
 echo -e "${yellowColor}\The following script are going to uninstall dotfiles and all of his dependencies "
 echo -e "Components to remove : ${resetColor}"
 sleep 2
-echo -e "${yellowColor}\
-        \- bspwm
-        - sxhkd
-        - nitrogen
-        - rofi
-        - polybar
-        - configuration files ${resetColor}"
+echo -e "${yellowColor}\- bspwm
+- sxhkd
+- nitrogen
+- rofi
+- polybar
+- configuration files ${resetColor}"
 sleep 4
 
 # find a file or folder and do something pending the result.
@@ -39,7 +38,8 @@ function deleteBinaries {
     sleep 2
     for dl in "${deps[@]}"
     do
-         existsItem "-f" "$dl" "`sudo pacman -R $dl --noconfirm`" "`echo "$redColor\${dl}not found $resetColor"`"
+         echo -e "$redColor\Deleting $dl $resetColor"
+         existsItem "-f" "$dl" "`sudo pacman -R $dl --noconfirm`"
          sleep 2
     done
 } 
@@ -49,7 +49,7 @@ function deleteConfigurations {
     echo -e "$blueColor\Deleting configurations files...$resetColor"
     for folders in "${deps[@]}"
     do
-        existsItem "-d" "$folders" "`rm -r $folders && echo "Deleting $folders configurations"`" "`echo -e "$redColor\ $folders configurations was not found $resetColor"`"
+        existsItem "-d" "$folders" "`rm -r $folders`" "`echo -e "$redColor\ $folders configuration was not found $resetColor"`"
         sleep 2
     done
     echo -e "$greenColor\Items deleted$resetColor"
