@@ -18,20 +18,7 @@ Bring permissions to <code>install.sh</code>
 ```
 chmod +x install.sh
 ```
-
-<b>IMPORTANT: if your interpreter is zsh execute the script as : </b>
-hint: you can look you current interpreter with <code>echo $SHELL</code>
+<b>Execute the script:  <code>install.sh</code>
 ```
 bash install.sh
 ```
-or else if your tnterpreter is bash, just execute it with :
-```
-./install.sh
-```
-
-
-
-
-
-
-# Preview
