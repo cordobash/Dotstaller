@@ -41,11 +41,11 @@ function deleteConfigurations {
     echo -e "$blueColor\Deleting configurations files...$resetColor"
     for folders in "${deps[@]}"
     do
-        existsItem "-d" "$folders" "`rm -r $folders`" "`echo -e "$redColor\ $folders configuration was not found $resetColor"`"
+        existsItem "-d" "$folders" "`rm -r $folders`" ""
         sleep 2
     done
     echo -e "$greenColor\Items deleted$resetColor"
-    sleep 1s
+    sleep 1
 }
 
 
