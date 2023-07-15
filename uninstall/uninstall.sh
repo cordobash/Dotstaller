@@ -11,15 +11,7 @@ blueColor="\e[1;34m   \b\e   "
 configPath=$HOME/.config/ # Path where configs are gonna put
 switchHome="cd $HOME" # switch to home user path
 
-echo -e "${yellowColor}\The following script are going to uninstall dotfiles and all of his dependencies "
-echo -e "Components to remove : ${resetColor}"
-sleep 2
-echo -e "${yellowColor}\- bspwm
-- sxhkd
-- nitrogen
-- rofi
-- polybar
-- configuration files ${resetColor}"
+echo -e "${yellowColor}\The following script are going to uninstall dotfiles and all of his dependencies.This may take time(5 minutes)"
 sleep 4
 
 # find a file or folder and do something pending the result.
@@ -39,7 +31,7 @@ function deleteBinaries {
     for dl in "${deps[@]}"
     do
          echo -e "$redColor\Deleting $dl $resetColor"
-         existsItem "-f" "$dl" "`sudo pacman -R $dl --noconfirm`"
+         existsItem "-f" "$dl" "`sudo pacman -R $dl --noconfirm`" ""
          sleep 2
     done
 } 
