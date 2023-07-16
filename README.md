@@ -4,6 +4,12 @@ Window Manager.
 
 # Preview
 
+
+Preview             |  Rofi Menu
+:-------------------------:|:-------------------------:
+![First Preview](https://github.com/IGerardoJR/Dotstaller/blob/main/preview1.png) |  ![Rofi Menu](https://github.com/IGerardoJR/Dotstaller/blob/main/preview2.png)
+
+
 # Installation
 clone this repo with :
   ```
