@@ -29,7 +29,7 @@ Bring permissions to <code>install.sh</code>
 ```
 chmod +x install.sh
 ```
-<b>Execute the script:  <code>install.sh</code>
+<b>Execute the script:  <code>install.sh</code></b>
 ```
 bash install.sh
 ```
