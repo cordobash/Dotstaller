@@ -33,7 +33,7 @@ depsNotFound=()
 # Setting up a counter for missing dependencies to deploy a warning message
 counterNotFound=0
 # Setting an array with the necessary dependencies
-dependencies=("bspwm" "sxhkd" "rofi" "nitrogen" "git" "wget" "polybar" "wmname")
+dependencies=("bspwm" "sxhkd" "rofi" "nitrogen" "git" "wget" "polybar" "wmname" "unzip")
 function lookDependencies {
     echo -e "${blueColor}\Verifying current dependencies ${resetColor}"
     for i in "${dependencies[@]}"
@@ -251,7 +251,7 @@ function SetDefaultImages {
 }
 
 
-SetDefaultImages "https://lardy-aids.000webhostapp.com/1228788.jpg" "1228788.jpg"
+SetDefaultImages "https://images4.alphacoders.com/122/1228788.jpg" "1228788.jpg"
 
 # bspwm & sxhkd has legacy permissions by that we could get errors to start/use the window manager
 # we need to :
